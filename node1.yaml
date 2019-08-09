@@ -54,7 +54,6 @@ services:
         extra_hosts:
             - "zookeeper2:${NODE3}"
             - "kafka2:${NODE3}"
-            - "kafka3:${NODE4}"
             - "orderer2.example.com:${NODE3}"
         depends_on:
             - zookeeper0
@@ -69,7 +68,7 @@ services:
         environment:
             - ORDERER_HOST=orderer0.example.com
             - CONFIGTX_ORDERER_ORDERERTYPE=kafka
-            - CONFIGTX_ORDERER_KAFKA_BROKERS=[kafka0:9092,kafka2:9092,kafka3:9092]
+            - CONFIGTX_ORDERER_KAFKA_BROKERS=[kafka0:9092,kafka2:9092]
             - ORDERER_KAFKA_RETRY_SHORTINTERVAL=1s
             - ORDERER_KAFKA_RETRY_SHORTTOTAL=30s
             - ORDERER_KAFKA_VERBOSE=true
@@ -79,9 +78,7 @@ services:
         extra_hosts:
             - "orderer2.example.com:${NODE3}"
             - "kafka2:${NODE3}"
-            - "kafka3:${NODE4}"
             - "peer0.org2.example.com:${NODE3}"
-            - "peer1.org2.example.com:${NODE4}"
         depends_on:
             - zookeeper0
             - kafka0
@@ -107,7 +104,6 @@ services:
         extra_hosts:
             - "orderer2.example.com:${NODE3}"
             - "peer0.org2.example.com:${NODE3}"
-            - "peer1.org2.example.com:${NODE4}"
         volumes:
             - /var/run/:/host/var/run/
             - ./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp:/etc/hyperledger/fabric/msp
@@ -140,7 +136,6 @@ services:
         extra_hosts:
             - "orderer2.example.com:${NODE3}"
             - "peer0.org2.example.com:${NODE3}"
-            - "peer1.org2.example.com:${NODE4}"
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
         command: /bin/bash
         volumes:
