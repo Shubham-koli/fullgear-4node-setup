@@ -17,7 +17,7 @@ services:
             - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
             - FABRIC_CA_SERVER_CA_NAME=ca.org1.example.com
             - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem
-            - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/2ed1824c667e60452d45e8388765bf808a4307b2efed9935b570e25a436f1e54_sk
+            - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/f634ae98ebd9ef47d9a9cf87356584f705268a0420ac2efe5e91f7e0cf94e78d_sk
         ports:
             - "7054:7054"
         command: sh -c 'fabric-ca-server start -b admin:adminpw'
@@ -33,9 +33,8 @@ services:
         container_name: zookeeper0
         environment:
             - ZOO_MY_ID=1
-            - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
+            - ZOO_SERVERS=server.1=0.0.0.0:2888:3888 server.2=zookeeper2:2888:3888
         extra_hosts:
-            - "zookeeper1:${NODE2}"
             - "zookeeper2:${NODE3}"
         networks:
             - fabric
@@ -47,18 +46,14 @@ services:
         container_name: kafka0
         environment:
             - KAFKA_BROKER_ID=0
-            - KAFKA_ZOOKEEPER_CONNECT=zookeeper0:2181,zookeeper1:2181,zookeeper2:2181
+            - KAFKA_ZOOKEEPER_CONNECT=0.0.0.0:2181,zookeeper2:2181
             - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka0:9092
             - KAFKA_MESSAGE_MAX_BYTES=1000012 B
             - KAFKA_REPLICA_FETCH_MAX_BYTES=1048576 B
             - KAFKA_REPLICA_FETCH_RESPONSE_MAX_BYTES=10485760 B
         extra_hosts:
-            - "zookeeper1:${NODE2}"
             - "zookeeper2:${NODE3}"
-            - "kafka1:${NODE2}"
             - "kafka2:${NODE3}"
-            - "kafka3:${NODE4}"
-            - "orderer1.example.com:${NODE2}"
             - "orderer2.example.com:${NODE3}"
         depends_on:
             - zookeeper0
@@ -73,7 +68,7 @@ services:
         environment:
             - ORDERER_HOST=orderer0.example.com
             - CONFIGTX_ORDERER_ORDERERTYPE=kafka
-            - CONFIGTX_ORDERER_KAFKA_BROKERS=[kafka0:9092,kafka1:9092,kafka2:9092,kafka3:9092]
+            - CONFIGTX_ORDERER_KAFKA_BROKERS=[kafka0:9092,kafka2:9092]
             - ORDERER_KAFKA_RETRY_SHORTINTERVAL=1s
             - ORDERER_KAFKA_RETRY_SHORTTOTAL=30s
             - ORDERER_KAFKA_VERBOSE=true
@@ -81,14 +76,9 @@ services:
             - ORDERER_ABSOLUTEMAXBYTES=10 MB
             - ORDERER_PREFERREDMAXBYTES=512 KB            
         extra_hosts:
-            - "orderer1.example.com:${NODE2}"
             - "orderer2.example.com:${NODE3}"
-            - "kafka1:${NODE2}"
             - "kafka2:${NODE3}"
-            - "kafka3:${NODE4}"
-            - "peer1.org1.example.com:${NODE2}"
             - "peer0.org2.example.com:${NODE3}"
-            - "peer1.org2.example.com:${NODE4}"
         depends_on:
             - zookeeper0
             - kafka0
@@ -109,15 +99,11 @@ services:
         environment:
             - CORE_PEER_ID=peer0.org1.example.com
             - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
-            - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org1.example.com:7051
             - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.example.com:7051
             - CORE_PEER_LOCALMSPID=Org1MSP
         extra_hosts:
-            - "orderer1.example.com:${NODE2}"
             - "orderer2.example.com:${NODE3}"
-            - "peer1.org1.example.com:${NODE2}"
             - "peer0.org2.example.com:${NODE3}"
-            - "peer1.org2.example.com:${NODE4}"
         volumes:
             - /var/run/:/host/var/run/
             - ./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp:/etc/hyperledger/fabric/msp
@@ -148,11 +134,8 @@ services:
             - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
             - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
         extra_hosts:
-            - "orderer1.example.com:${NODE2}"
             - "orderer2.example.com:${NODE3}"
-            - "peer1.org1.example.com:${NODE2}"
             - "peer0.org2.example.com:${NODE3}"
-            - "peer1.org2.example.com:${NODE4}"
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
         command: /bin/bash
         volumes:
