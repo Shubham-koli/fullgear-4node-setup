@@ -16,8 +16,10 @@ services:
         environment:
             - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
             - FABRIC_CA_SERVER_CA_NAME=ca.org1.example.com
+            - FABRIC_CA_SERVER_TLS_ENABLED=true
             - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem
             - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/2ed1824c667e60452d45e8388765bf808a4307b2efed9935b570e25a436f1e54_sk
+            - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem
         ports:
             - "7054:7054"
         command: sh -c 'fabric-ca-server start -b admin:adminpw'
@@ -108,6 +110,7 @@ services:
             service: peer
         environment:
             - CORE_PEER_ID=peer0.org1.example.com
+            - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
             - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
             - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org1.example.com:7051
             - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.example.com:7051
